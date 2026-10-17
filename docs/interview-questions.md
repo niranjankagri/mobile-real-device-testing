@@ -175,14 +175,14 @@ gives each test a clean shop in milliseconds.
 
 Wait for something only the new page has, or for the expected text, never "read whatever is there now".
 
-**In the project:** `PocketShop.awaitHeading`.
+**In the project:** each page object's `await()`, through `BasePage.awaitHeading`.
 
 ### Q24. What did the Android phone show that emulation did not?
 
 With the on-screen keyboard open, the automated tap on the checkout button landed on `<html>`, so the form was never
 submitted. Closing the keyboard and waiting for the layout to settle fixed it.
 
-**In the project:** `PocketShop.tapAfterTyping`.
+**In the project:** `BasePage.tapAfterTyping`, used by `CheckoutPage.placeOrder`.
 
 ### Q25. How did you find that cause?
 

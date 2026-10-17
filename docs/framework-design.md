@@ -18,7 +18,24 @@ Why the project is built the way it is. The README says what it does and how to 
 | `Target`, `WebDrivers` | local emulation or a real phone browser | Selenium 4, Chrome mobile emulation, BrowserStack Automate |
 | `Tunnel` | lets BrowserStack's devices open `bs-local.com:4330` on this machine | BrowserStack Local (Java binding) |
 | `AppDrivers` | native app sessions on a real iPhone | Appium Java client, XCUITest, BrowserStack App Automate |
-| tests | layout, touch and input, shopping flow, native app | TestNG |
+| page objects (`web/pages`) | one class per page plus the `Header` component; `PocketShop` opens pages by address | Selenium 4 |
+| screen objects (`app/screens`) | the native app's screens and its `TabBar` | Appium Java client |
+| tests | layout, touch and input, shopping flow, native app; no locators, only page and screen methods | TestNG |
+
+### Design patterns
+
+- **Page Object Model.** Each page class keeps its locators private and offers what a user does (`setQuantity`,
+  `addToCart`, `enterDetails`, `placeOrder`) and what a test reads (`total`, `error(EMAIL)`, `orderNumber`).
+  `BasePage` holds the shared parts: waits, taps, typing, `tapAfterTyping`, and measurements of the laid-out page
+  (`box`, `viewportWidth`, `sidewaysOverflow`).
+- **Components.** The header is on every page, so it is one `Header` object reached with `page.header()`; the native
+  app's tab bar is a `TabBar`.
+- **Fluent navigation.** An action that leads to another page returns that page object after calling its
+  `await()` waits until the page is ready (its heading). Tests cannot read the previous page by mistake.
+- **Factory.** `WebDrivers.create(target)` returns emulation or a real phone browser; tests never branch on the target.
+- **Test data object.** `Customer` holds checkout details, with named sample customers.
+- **Template method.** `WebTestBase` and `AppTestBase` fix the life cycle: one session per suite, a reset before each
+  test, a screenshot on failure, the result sent to BrowserStack.
 
 ## 3. One suite, three targets
 
@@ -58,7 +75,7 @@ Why the project is built the way it is. The README says what it does and how to 
 On the real Samsung Galaxy S24, the complete-purchase test stayed on the checkout page with a valid form. The
 screenshot alone suggested a timing problem; a probe showed otherwise: the postcode field still had focus, the
 viewport was 646 px high with the keyboard open, the button was fully visible at y 548, and the tap landed on `<html>`
-with no submit event. `tapAfterTyping` now blurs the field (the keyboard closes), waits until the button's position is
+with no submit event. `BasePage.tapAfterTyping` (used by `CheckoutPage.placeOrder`) now blurs the field (the keyboard closes), waits until the button's position is
 the same in two measurements 300 ms apart, and then taps. Local emulation and iPhone Safari never showed it.
 
 The stricter "wait for the expected heading" check, written for the first (wrong) guess, stays because it is the

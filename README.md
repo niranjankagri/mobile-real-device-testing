@@ -13,6 +13,10 @@ Java 21, TestNG. Written for a **100-minute free trial**: every real-device minu
 
 ![Results of the real-device runs](docs/images/real-device-results.png)
 
+PocketShop as the tests see it on a phone (Chrome mobile emulation, 390 × 844 CSS px):
+
+![PocketShop on a phone: products, menu, product, cart, checkout errors, confirmation](docs/images/pocketshop-screens.png)
+
 **Why the app is in this repository:** the web tests run against their own copy of PocketShop, started fresh for every
 run. No shared environment means no bot checks, no outages and no changes somewhere else that break these tests. Real
 devices reach it through the tunnel, the same way teams test a staging server that is not on the internet.
@@ -30,11 +34,28 @@ devices reach it through the tunnel, the same way teams test a staging server th
 
 The Android phone failed the checkout test that passed in local Chrome and on the iPhone. A screenshot showed a valid
 form and no errors, yet the order was never placed. My first guess, a timing race, was wrong. A probe in a single
-40-second run showed the real cause: **with the on-screen keyboard open, the automated tap landed on `<html>`, not on
+50-second run showed the real cause: **with the on-screen keyboard open, the automated tap landed on `<html>`, not on
 the visible button**, so no submit event fired. The tests now close the keyboard and wait for the layout to settle
-before tapping, as a person does (`PocketShop.tapAfterTyping`).
+before tapping, as a person does (`BasePage.tapAfterTyping`, used by `CheckoutPage.placeOrder`).
+
+<img src="docs/images/android-checkout-real-device.png" alt="Checkout on the real Galaxy S24: a valid form, but the order was never placed" width="300">
+
+*The failure screenshot from the real Samsung Galaxy S24: every field valid, cart still 3, and no order placed.*
 
 Emulation does not have an on-screen keyboard. This is the kind of difference that only a real device shows.
+
+## Design
+
+| Pattern | Where | Why |
+|---|---|---|
+| Page Object Model | `web/pages`: `BasePage`, `ProductListPage`, `ProductPage`, `CartPage`, `CheckoutPage`, `ConfirmationPage` | locators and waits live in one place per page; tests contain no `By` and no JavaScript |
+| Component object | `Header` (on every page), `TabBar` (native app) | parts shared by several pages are modelled once |
+| Screen objects | `app/screens`: `Screen`, `UiElementsScreen`, `WebViewScreen` | the same idea for the native app |
+| Fluent navigation | each action returns the page it leads to: `openProduct(..).setQuantity(3).addToCart().header().openCart().checkout()` | a test reads as the user's journey, and the compiler checks the page order |
+| Entry point | `PocketShop` opens a page by its address and returns its page object | one place knows the URLs |
+| Factory | `WebDrivers.create(target)`, `AppDrivers.iphone()` | tests never know whether they run on emulation or a real phone |
+| Test data object | `Customer.valid()`, `Customer.withInvalidEmailAndMissingFields()` | who is buying, instead of four loose strings |
+| Template method | `WebTestBase`, `AppTestBase` | one session per suite, reset before each test, evidence on failure, result sent to BrowserStack |
 
 ## Spending the 100 minutes carefully
 
@@ -99,8 +120,11 @@ src/main/java/com/niranjankagri/mobile/
   driver/Tunnel            BrowserStack Local
   driver/AppDrivers        IOSDriver for the native app on a real iPhone
 src/test/java/com/niranjankagri/mobile/
-  web/                     WebTestBase, PocketShop (page actions), three test classes
+  web/                     WebTestBase and three test classes
+  web/pages/               PocketShop (entry point), BasePage, Header, one page object per page
+  web/data/                Customer (test data)
   app/                     AppTestBase, SampleAppTest
+  app/screens/             Screen, TabBar, UiElementsScreen, WebViewScreen
 ```
 
 ## CI
