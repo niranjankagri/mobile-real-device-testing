@@ -1,0 +1,262 @@
+/* PocketShop: mobile first. The phone layout is the default; wider screens get more columns and an inline menu. */
+
+:root {
+  --text: #1c1f23;
+  --muted: #555e68;
+  --background: #ffffff;
+  --surface: #f3f5f7;
+  --primary: #0a5bb5;
+  --on-primary: #ffffff;
+  --error: #b42318;
+  --border: #c9d0d8;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, 'Liberation Sans', sans-serif;
+  /* 16px or more: iOS Safari zooms into any input whose text is smaller, and does not zoom back */
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--text);
+  background: var(--background);
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Header: logo, cart, and a menu button that only phones see */
+
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: var(--background);
+  border-bottom: 1px solid var(--border);
+}
+
+.logo {
+  font-weight: 700;
+  font-size: 1.25rem;
+  color: var(--text);
+  text-decoration: none;
+  margin-right: auto;
+}
+
+/* 44 x 44 CSS px: the smallest comfortable touch target (Apple's guideline, WCAG 2.5.5) */
+.icon-button,
+.cart-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0 8px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--background);
+  color: var(--text);
+  font: inherit;
+  text-decoration: none;
+}
+
+.cart-count {
+  margin-left: 4px;
+  min-width: 1.5em;
+  padding: 0 4px;
+  border-radius: 999px;
+  background: var(--primary);
+  color: var(--on-primary);
+  font-size: 0.875rem;
+  text-align: center;
+}
+
+.main-nav {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: var(--background);
+  border-bottom: 1px solid var(--border);
+}
+
+.main-nav.open {
+  display: block;
+}
+
+.main-nav ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.main-nav a {
+  display: block;
+  min-height: 44px;
+  padding: 10px 16px;
+  color: var(--primary);
+}
+
+main {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+/* Products: one column on a phone */
+
+.products {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.product-card {
+  display: flex;
+  gap: 12px;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+}
+
+.product-card img {
+  width: 96px;
+  height: 96px;
+}
+
+.product-card a {
+  color: var(--text);
+  font-weight: 700;
+}
+
+.price {
+  font-weight: 700;
+}
+
+/* Product page */
+
+.stepper {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 16px 0;
+}
+
+.stepper output {
+  min-width: 2ch;
+  text-align: center;
+  font-size: 1.25rem;
+}
+
+.button {
+  display: inline-block;
+  min-height: 48px;
+  padding: 12px 20px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--primary);
+  color: var(--on-primary);
+  font: inherit;
+  font-weight: 700;
+  text-align: center;
+  text-decoration: none;
+}
+
+/* On a phone the main action stays at the bottom of the screen, within thumb reach */
+.action-bar {
+  position: sticky;
+  bottom: 0;
+  padding: 12px 0;
+  background: var(--background);
+}
+
+.action-bar .button {
+  width: 100%;
+}
+
+/* Cart and checkout */
+
+.cart-lines {
+  margin: 0 0 16px;
+  padding: 0;
+  list-style: none;
+}
+
+.cart-lines li {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.field {
+  margin-bottom: 16px;
+}
+
+.field label {
+  display: block;
+  font-weight: 700;
+}
+
+.field input {
+  display: block;
+  width: 100%;
+  min-height: 48px;
+  margin-top: 4px;
+  padding: 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font: inherit;
+}
+
+.error {
+  margin: 4px 0 0;
+  color: var(--error);
+  font-weight: 700;
+}
+
+/* Tablets and desktops: more columns, the menu inline, no menu button */
+
+@media (min-width: 768px) {
+  .menu-button {
+    display: none;
+  }
+
+  .main-nav {
+    display: block;
+    position: static;
+    border: 0;
+  }
+
+  .main-nav ul {
+    display: flex;
+    gap: 8px;
+  }
+
+  .products {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .action-bar {
+    position: static;
+  }
+
+  .action-bar .button {
+    width: auto;
+  }
+}

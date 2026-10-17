@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <!-- Without this line a phone renders the page 980 px wide and shrinks it: the classic broken mobile site -->
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cart | PocketShop</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <header class="site-header">
+    <a class="logo" href="index.html">PocketShop</a>
+    <a class="cart-link" id="cart-link" href="cart.html" aria-label="Cart">Cart<span class="cart-count" id="cart-count">0</span></a>
+    <button class="icon-button menu-button" id="menu-button" type="button" aria-expanded="false" aria-controls="main-nav">Menu</button>
+    <nav class="main-nav" id="main-nav" aria-label="Main">
+      <ul>
+        <li><a href="index.html">Products</a></li>
+        <li><a href="cart.html">Cart</a></li>
+        <li><a href="checkout.html">Checkout</a></li>
+      </ul>
+    </nav>
+  </header>
+  <main>
+    <h1>Your cart</h1>
+    <ul class="cart-lines" id="cart-lines"></ul>
+    <p>Total: <strong id="cart-total"></strong></p>
+    <div class="action-bar">
+      <a class="button" id="checkout-link" href="checkout.html">Checkout</a>
+    </div>
+  </main>
+</body>
+</html>
