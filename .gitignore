@@ -1,0 +1,11 @@
+# Maven build output
+target/
+.mvn/wrapper/maven-wrapper.jar
+
+# Test reports and screenshots
+reports/
+
+# IDE settings
+.idea/
+*.iml
+.vscode/

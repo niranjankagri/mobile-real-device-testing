@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Mobile testing on real devices with BrowserStack, in two parts:
+    web   PocketShop (a small responsive shop in this repository) on real phone browsers: Safari on an iPhone,
+          Chrome on an Android phone; locally on Chrome's mobile emulation (free, also in CI)
+    app   BrowserStack's sample iOS app on a real iPhone (Appium, XCUITest)
+
+  ./mvnw test                                   web suite on local Chrome mobile emulation (no BrowserStack)
+  ./mvnw test -Dsuite=web -Dtarget=iphone       web suite on a real iPhone (BrowserStack Automate minutes)
+  ./mvnw test -Dsuite=web -Dtarget=android      web suite on a real Android phone
+  ./mvnw test -Dsuite=app                       native app suite on a real iPhone (App Automate minutes)
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.niranjankagri</groupId>
+    <artifactId>mobile-real-device-testing</artifactId>
+    <version>1.0.0</version>
+    <name>mobile-real-device-testing</name>
+
+    <properties>
+        <maven.compiler.release>21</maven.compiler.release>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <!-- Which TestNG suite runs: web (default) or app -->
+        <suite>web</suite>
+        <!-- Where the web suite runs: local (Chrome mobile emulation), iphone or android (BrowserStack) -->
+        <target>local</target>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.seleniumhq.selenium</groupId>
+            <artifactId>selenium-java</artifactId>
+            <version>4.51.0</version>
+        </dependency>
+        <!-- Appium's Java client: IOSDriver and XCUITest options for the native app suite -->
+        <dependency>
+            <groupId>io.appium</groupId>
+            <artifactId>java-client</artifactId>
+            <version>11.0.0</version>
+        </dependency>
+        <!-- Starts and stops the BrowserStack Local tunnel, so real devices can reach PocketShop on this machine -->
+        <dependency>
+            <groupId>com.browserstack</groupId>
+            <artifactId>browserstack-local-java</artifactId>
+            <version>1.1.9</version>
+        </dependency>
+        <dependency>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+            <version>7.12.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>2.0.17</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.16.0</version>
+            </plugin>
+            <plugin>
+                <!-- 3.5.x: 3.6.0 ignores testng.xml suite files in TestNG projects -->
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.5.6</version>
+                <configuration>
+                    <suiteXmlFiles>
+                        <suiteXmlFile>src/test/resources/testng-${suite}.xml</suiteXmlFile>
+                    </suiteXmlFiles>
+                    <systemPropertyVariables>
+                        <target>${target}</target>
+                    </systemPropertyVariables>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>
