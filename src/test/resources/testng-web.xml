@@ -1,0 +1,11 @@
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<!-- PocketShop on a phone browser: -Dtarget=local (default, Chrome mobile emulation), iphone or android (BrowserStack). -->
+<suite name="Mobile web" verbose="1">
+    <test name="Web">
+        <classes>
+            <class name="com.niranjankagri.mobile.web.MobileLayoutTest"/>
+            <class name="com.niranjankagri.mobile.web.TouchAndInputTest"/>
+            <class name="com.niranjankagri.mobile.web.ShoppingFlowTest"/>
+        </classes>
+    </test>
+</suite>
