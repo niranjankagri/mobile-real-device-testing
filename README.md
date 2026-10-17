@@ -91,7 +91,7 @@ setx BROWSERSTACK_ACCESS_KEY "your_access_key"
 Then, in a new terminal:
 
 ```
-cd /d D:\Data\Work\mobile-real-device-testing
+cd /d D:\Data\Work\portfolio-projects\mobile-real-device-testing
 mvnw.cmd test                                web suite, Chrome mobile emulation (free)
 mvnw.cmd test -Dtarget=iphone                web suite, Safari on a real iPhone 16
 mvnw.cmd test -Dtarget=android               web suite, Chrome on a real Samsung Galaxy S24
