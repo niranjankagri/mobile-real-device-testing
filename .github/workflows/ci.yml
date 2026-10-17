@@ -1,0 +1,84 @@
+# CI. On every push: the web suite in Chrome mobile emulation (free).
+# Real devices only when started by hand (Actions > CI > Run workflow): every BrowserStack session costs minutes,
+# so a push must never start one. Needs the repository secrets BROWSERSTACK_USERNAME and BROWSERSTACK_ACCESS_KEY.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      devices:
+        description: Real-device runs on BrowserStack (costs minutes)
+        type: choice
+        default: none
+        options: [none, iphone-web, android-web, iphone-app, all]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  emulation:
+    name: Web suite, Chrome mobile emulation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+      # Chrome is preinstalled on the runner; Selenium Manager fetches the matching driver.
+      - run: ./mvnw -B test -Dtarget=local -Dheadless=true
+      - uses: actions/upload-artifact@v7
+        if: failure()
+        with:
+          name: emulation-failures
+          path: reports
+          retention-days: 7
+
+  real-devices:
+    name: Real device (${{ matrix.run }})
+    needs: emulation
+    if: github.event_name == 'workflow_dispatch' && inputs.devices != 'none'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        run: [iphone-web, android-web, iphone-app]
+    env:
+      BROWSERSTACK_USERNAME: ${{ secrets.BROWSERSTACK_USERNAME }}
+      BROWSERSTACK_ACCESS_KEY: ${{ secrets.BROWSERSTACK_ACCESS_KEY }}
+    steps:
+      - name: Selected?
+        id: pick
+        run: |
+          if [ "${{ inputs.devices }}" = "all" ] || [ "${{ inputs.devices }}" = "${{ matrix.run }}" ]; then echo "go=true" >> "$GITHUB_OUTPUT"
+          else echo "go=false" >> "$GITHUB_OUTPUT"; fi
+      - uses: actions/checkout@v7
+        if: steps.pick.outputs.go == 'true'
+      - uses: actions/setup-java@v6
+        if: steps.pick.outputs.go == 'true'
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+      - name: Run on BrowserStack
+        if: steps.pick.outputs.go == 'true'
+        run: |
+          case "${{ matrix.run }}" in
+            iphone-web)  ./mvnw -B test -Dtarget=iphone  -DbsBuild="ci-${{ github.run_number }}" ;;
+            android-web) ./mvnw -B test -Dtarget=android -DbsBuild="ci-${{ github.run_number }}" ;;
+            iphone-app)  ./mvnw -B test -Dsuite=app      -DbsBuild="ci-${{ github.run_number }}" ;;
+          esac
+      - uses: actions/upload-artifact@v7
+        if: failure() && steps.pick.outputs.go == 'true'
+        with:
+          name: failures-${{ matrix.run }}
+          path: reports
+          retention-days: 7
