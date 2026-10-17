@@ -14,6 +14,7 @@ public final class Tunnel implements AutoCloseable {
 
     private final Local local = new Local();
 
+    /** Starts the tunnel and waits until it is connected; the device sessions are created after this. */
     public static Tunnel open() {
         Tunnel tunnel = new Tunnel();
         Map<String, String> args = new HashMap<>();

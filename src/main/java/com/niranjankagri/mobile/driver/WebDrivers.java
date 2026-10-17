@@ -20,6 +20,7 @@ public final class WebDrivers {
 
     private WebDrivers() {}
 
+    /** Local Chrome emulating a phone, or the browser on a real phone at BrowserStack. */
     public static WebDriver create(Target target, String sessionName) {
         return switch (target) {
             case LOCAL -> localPhone();
@@ -45,7 +46,8 @@ public final class WebDrivers {
         Map<String, Object> options = BrowserStack.sessionOptions(sessionName);
         options.put("deviceName", device);
         options.put("osVersion", osVersion);
-        options.put("realMobile", "true");
+        options.put("realMobile", "true"); // a physical phone, not an emulator or simulator
+        // Use this run's tunnel, so bs-local.com reaches the site on this machine
         options.put("local", "true");
         options.put("localIdentifier", BrowserStack.LOCAL_IDENTIFIER);
         capabilities.setCapability("bstack:options", options);
@@ -60,6 +62,7 @@ public final class WebDrivers {
         if (!target.onBrowserStack()) {
             return;
         }
+        // The reason goes inside a JSON string: remove what would break it
         String safeReason = reason.replace("\\", " ").replace("\"", "'");
         ((JavascriptExecutor) driver).executeScript("browserstack_executor: {\"action\": \"setSessionStatus\", \"arguments\": "
                 + "{\"status\": \"" + (passed ? "passed" : "failed") + "\", \"reason\": \"" + safeReason + "\"}}");

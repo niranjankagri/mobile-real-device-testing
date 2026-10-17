@@ -36,14 +36,17 @@ public enum Target {
         }
     }
 
+    /** True for the real devices: they need credentials and the tunnel. */
     public boolean onBrowserStack() {
         return this != LOCAL;
     }
 
+    /** Readable name, used in the BrowserStack session name. */
     public String description() {
         return description;
     }
 
+    /** Address of PocketShop for this target, for example http://bs-local.com:4330/. */
     public String baseUrl(int port) {
         return "http://" + host + ":" + port + "/";
     }

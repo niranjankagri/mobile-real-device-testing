@@ -23,9 +23,11 @@
   </header>
   <main>
     <article id="product">
+      <!-- Filled in by app.js from ?id= in the address -->
       <img id="product-image" src="mug.svg" alt="" width="240" height="240">
       <h1 id="product-name">Product</h1>
       <p class="price" id="product-price"></p>
+      <!-- Quantity: two 44 px buttons; aria-live reads the new value out after a tap -->
       <div class="stepper" role="group" aria-label="Quantity">
         <button class="icon-button" id="less" type="button" aria-label="One less">−</button>
         <output id="quantity" aria-live="polite">1</output>

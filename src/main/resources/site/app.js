@@ -6,6 +6,7 @@ const PRODUCTS = [
   { id: 'bottle', name: 'Steel water bottle', price: 19.9, image: 'bottle.svg' },
 ];
 
+// Prices in euros with two decimals, for example "€ 12.50"
 const money = (value) => `€ ${value.toFixed(2)}`;
 const byId = (id) => PRODUCTS.find((p) => p.id === id);
 
@@ -18,15 +19,18 @@ function readCart() {
   }
 }
 
+/** Saves the cart and updates the badge in the header. */
 function writeCart(cart) {
   localStorage.setItem('cart', JSON.stringify(cart));
   showCartCount();
 }
 
+/** Number of items in the cart (quantities added up). */
 function cartCount() {
   return Object.values(readCart()).reduce((sum, quantity) => sum + quantity, 0);
 }
 
+/** Shows the item count on the cart badge, on every page. */
 function showCartCount() {
   const badge = document.getElementById('cart-count');
   if (badge) badge.textContent = String(cartCount());
@@ -43,6 +47,7 @@ function setUpMenu() {
   });
 }
 
+/** Product list page: one card per product. The CSS stacks them in one column on a phone. */
 function renderProducts() {
   const list = document.getElementById('products');
   if (!list) return;
@@ -54,6 +59,7 @@ function renderProducts() {
   ).join('');
 }
 
+/** Product page: shows the product from ?id=, the quantity stepper (1 to 9) and the Add to cart button. */
 function setUpProduct() {
   const page = document.getElementById('product');
   if (!page) return;
@@ -78,10 +84,12 @@ function setUpProduct() {
     const cart = readCart();
     cart[product.id] = (cart[product.id] || 0) + amount;
     writeCart(cart);
+    // A role="status" element: screen readers announce the message, and the tests wait for it
     document.getElementById('added').textContent = `Added ${amount} to your cart.`;
   });
 }
 
+/** Cart page: one line per product, the total, and no checkout link when the cart is empty. */
 function setUpCart() {
   const lines = document.getElementById('cart-lines');
   if (!lines) return;
@@ -99,11 +107,16 @@ function setUpCart() {
   document.getElementById('cart-total').textContent = money(total);
 }
 
+/**
+ * Checkout page: checks every field on submit. Each invalid field gets its message and aria-invalid, and the cursor
+ * goes to the first one. When everything is valid the cart is emptied and the confirmation page opens.
+ */
 function setUpCheckout() {
   const form = document.getElementById('checkout-form');
   if (!form) return;
   form.addEventListener('submit', (event) => {
     event.preventDefault();
+    // Each rule returns true, or the message to show
     const rules = {
       name: (v) => v.trim().length > 0 || 'Enter your name',
       email: (v) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) || 'Enter an email like name@example.com',
@@ -128,11 +141,13 @@ function setUpCheckout() {
   });
 }
 
+/** Confirmation page: shows the order number from ?order=. */
 function setUpDone() {
   const order = document.getElementById('order-number');
   if (order) order.textContent = new URLSearchParams(location.search).get('order') || '';
 }
 
+// Every page loads this script; each set-up function does nothing on pages without its elements.
 setUpMenu();
 showCartCount();
 renderProducts();

@@ -23,6 +23,7 @@
   </header>
   <main>
     <h1>Checkout</h1>
+    <!-- novalidate: app.js checks the fields itself, so the messages are the same in every browser -->
     <form id="checkout-form" novalidate>
       <!-- type, inputmode and autocomplete choose the phone keyboard and let the browser fill the field -->
       <div class="field">
@@ -45,6 +46,7 @@
         <input id="postcode" name="postcode" type="text" inputmode="numeric" autocomplete="postal-code" aria-describedby="postcode-error">
         <p class="error" id="postcode-error"></p>
       </div>
+      <!-- Fixed at the bottom of the screen on phones (styles.css), within thumb reach -->
       <div class="action-bar">
         <button class="button" id="place-order" type="submit">Place order</button>
       </div>

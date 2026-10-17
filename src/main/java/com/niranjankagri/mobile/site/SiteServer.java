@@ -38,6 +38,7 @@ public final class SiteServer implements AutoCloseable {
         }
     }
 
+    /** Answers one request with a file of the site, or 404. */
     private static void handle(HttpExchange exchange) throws IOException {
         String path = exchange.getRequestURI().getPath();
         String file = path.equals("/") ? "index.html" : path.substring(1);
@@ -62,6 +63,7 @@ public final class SiteServer implements AutoCloseable {
         }
     }
 
+    /** The port the site is running on. */
     public int port() {
         return server.getAddress().getPort();
     }

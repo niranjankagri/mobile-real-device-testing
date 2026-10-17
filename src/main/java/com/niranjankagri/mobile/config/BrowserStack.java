@@ -23,10 +23,12 @@ public final class BrowserStack {
 
     private BrowserStack() {}
 
+    /** The account name, from BROWSERSTACK_USERNAME. */
     public static String username() {
         return required("BROWSERSTACK_USERNAME");
     }
 
+    /** The access key, from BROWSERSTACK_ACCESS_KEY. Used by the sessions and the tunnel. */
     public static String accessKey() {
         return required("BROWSERSTACK_ACCESS_KEY");
     }
@@ -44,6 +46,7 @@ public final class BrowserStack {
         return options;
     }
 
+    /** Reads an environment variable, with a clear message instead of a failed login when it is missing. */
     private static String required(String name) {
         String value = System.getenv(name);
         if (value == null || value.isBlank()) {
