@@ -1,13 +1,12 @@
 package com.niranjankagri.mobile.app;
 
+import com.niranjankagri.mobile.app.screens.UiElementsScreen;
 import com.niranjankagri.mobile.driver.AppDrivers;
 import io.appium.java_client.ios.IOSDriver;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.time.Duration;
 import org.openqa.selenium.OutputType;
-import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.ITestResult;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.AfterSuite;
@@ -16,27 +15,31 @@ import org.testng.annotations.BeforeSuite;
 
 /**
  * One app session on a real iPhone for the whole suite (each session costs start-up time and App Automate minutes).
- * Before each test the app is restarted, so every test begins on the first tab.
+ * Before each test the app is restarted, so every test begins on the first screen. Tests reach the app only through
+ * its screen objects.
  */
 public abstract class AppTestBase {
 
     /** Bundle id of BrowserStack's sample app, as the discovery session reported it. */
     static final String BUNDLE_ID = "com.browserstack.Sample-iOS";
 
-    protected static IOSDriver driver;
-    protected static WebDriverWait wait;
+    private static IOSDriver driver;
     private static int failures;
+
+    /** The screen the app shows after the restart; each test starts here. */
+    protected UiElementsScreen app;
 
     @BeforeSuite(alwaysRun = true)
     public void startApp() {
         driver = AppDrivers.iphone("Sample app suite: native iOS on a real iPhone");
-        wait = new WebDriverWait(driver, Duration.ofSeconds(15));
     }
 
+    /** terminateApp + activateApp: a cold start of the same installed app, quicker than a new session. */
     @BeforeMethod(alwaysRun = true)
     public void restartApp() {
         driver.terminateApp(BUNDLE_ID);
         driver.activateApp(BUNDLE_ID);
+        app = UiElementsScreen.atStart(driver);
     }
 
     @AfterMethod(alwaysRun = true)
@@ -50,6 +53,7 @@ public abstract class AppTestBase {
         }
     }
 
+    /** Sends the result to the BrowserStack dashboard (it only sees commands, not test results) and ends the session. */
     @AfterSuite(alwaysRun = true)
     public void endSession() {
         if (driver == null) {

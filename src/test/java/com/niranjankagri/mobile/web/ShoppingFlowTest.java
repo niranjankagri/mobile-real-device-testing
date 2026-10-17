@@ -1,9 +1,15 @@
 package com.niranjankagri.mobile.web;
 
+import static com.niranjankagri.mobile.web.pages.CheckoutPage.Field.EMAIL;
+import static com.niranjankagri.mobile.web.pages.CheckoutPage.Field.PHONE;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
-import org.openqa.selenium.By;
+import com.niranjankagri.mobile.web.data.Customer;
+import com.niranjankagri.mobile.web.pages.CartPage;
+import com.niranjankagri.mobile.web.pages.CheckoutPage;
+import com.niranjankagri.mobile.web.pages.ConfirmationPage;
+import com.niranjankagri.mobile.web.pages.ProductPage;
 import org.testng.annotations.Test;
 
 /** The shop's main journey, done with taps and the on-screen keyboard. */
@@ -11,51 +17,50 @@ public class ShoppingFlowTest extends WebTestBase {
 
     @Test(description = "Adding a product with quantity 2 updates the cart badge and the cart")
     public void addingToCartUpdatesTheBadge() {
-        shop.addToCart("Folding desk lamp", 2);
-        assertEquals(shop.cartCount(), 2);
+        ProductPage product = shop.openProductList().openProduct("Folding desk lamp").setQuantity(2).addToCart();
+        assertEquals(product.header().cartCount(), 2);
 
-        shop.tap(By.id("cart-link"));
-        assertEquals(shop.visible(By.cssSelector("[data-line='lamp']")).getText(), "2 × Folding desk lamp\n€ 68.00");
-        assertEquals(shop.visible(By.id("cart-total")).getText(), "€ 68.00");
+        // The cart page shows the line and the total: 2 x 34.00
+        CartPage cart = product.header().openCart();
+        assertEquals(cart.line("lamp"), "2 × Folding desk lamp\n€ 68.00");
+        assertEquals(cart.total(), "€ 68.00");
     }
 
     @Test(description = "The cart survives a reload: it is kept on the device")
     public void cartSurvivesAReload() {
-        shop.addToCart("Steel water bottle", 1);
-        shop.open("cart.html");
-        assertEquals(shop.cartCount(), 1);
-        assertEquals(shop.visible(By.id("cart-total")).getText(), "€ 19.90");
+        shop.openProductList().openProduct("Steel water bottle").addToCart();
+        // Loading the page again from the server: the cart must come back from localStorage
+        CartPage cart = shop.openCart();
+        assertEquals(cart.header().cartCount(), 1);
+        assertEquals(cart.total(), "€ 19.90");
     }
 
     @Test(description = "Checkout with invalid details shows the errors and moves the cursor to the first one")
     public void invalidCheckoutShowsErrors() {
-        shop.open("checkout.html");
-        shop.type(By.id("name"), "Mia Wagner");
-        shop.type(By.id("email"), "mia-at-example");
-        shop.tapAfterTyping(By.id("place-order"));
+        CheckoutPage checkout = shop.openCheckout()
+                .enterDetails(Customer.withInvalidEmailAndMissingFields())
+                .placeOrderExpectingErrors();
 
-        assertEquals(shop.visible(By.id("email-error")).getText(), "Enter an email like name@example.com");
-        assertEquals(shop.visible(By.id("phone-error")).getText(), "Enter a phone number");
-        assertEquals(shop.visible(By.id("email")).getAttribute("aria-invalid"), "true");
-        Object focused = shop.script("return document.activeElement.id;");
-        assertEquals(focused, "email", "focus should move to the first invalid field");
+        // One message per invalid field, the field marked for screen readers, and the cursor on the first error
+        assertEquals(checkout.error(EMAIL), "Enter an email like name@example.com");
+        assertEquals(checkout.error(PHONE), "Enter a phone number");
+        assertTrue(checkout.isMarkedInvalid(EMAIL));
+        assertEquals(checkout.focusedFieldId(), "email", "focus should move to the first invalid field");
     }
 
     @Test(description = "A complete purchase on the phone: add, cart, checkout, confirmation, empty cart")
     public void completePurchase() {
-        shop.addToCart("Enamel camping mug", 3);
-        shop.tap(By.id("cart-link"));
-        shop.tap(By.id("checkout-link"));
-        shop.awaitHeading("Checkout");
+        // Add 3 mugs, then go to the checkout through the cart, with taps only
+        CheckoutPage checkout = shop.openProductList()
+                .openProduct("Enamel camping mug").setQuantity(3).addToCart()
+                .header().openCart()
+                .checkout();
 
-        shop.type(By.id("name"), "Mia Wagner");
-        shop.type(By.id("email"), "mia@example.com");
-        shop.type(By.id("phone"), "+49 30 1234567");
-        shop.type(By.id("postcode"), "10115");
-        shop.tapAfterTyping(By.id("place-order"));
+        // Valid details typed on the phone's keyboard; placeOrder waits for the confirmation page
+        ConfirmationPage confirmation = checkout.enterDetails(Customer.valid()).placeOrder();
 
-        shop.awaitHeading("Order confirmed");
-        assertTrue(shop.visible(By.id("order-number")).getText().matches("\\d{6}"));
-        assertEquals(shop.cartCount(), 0);
+        // A 6-digit order number, and the cart is empty again
+        assertTrue(confirmation.orderNumber().matches("\\d{6}"));
+        assertEquals(confirmation.header().cartCount(), 0);
     }
 }

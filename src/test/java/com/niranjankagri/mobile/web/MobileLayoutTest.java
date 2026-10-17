@@ -4,9 +4,11 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
+import com.niranjankagri.mobile.web.pages.BasePage;
+import com.niranjankagri.mobile.web.pages.Header;
+import com.niranjankagri.mobile.web.pages.ProductListPage;
 import java.util.List;
-import java.util.Map;
-import org.openqa.selenium.By;
+import java.util.function.Supplier;
 import org.openqa.selenium.WebElement;
 import org.testng.annotations.Test;
 
@@ -15,55 +17,52 @@ public class MobileLayoutTest extends WebTestBase {
 
     @Test(description = "The browser really is phone-sized and touch-capable (proves the target, real or emulated)")
     public void browserIsAPhone() {
-        Number width = (Number) shop.script("return window.innerWidth;");
-        Number touchPoints = (Number) shop.script("return navigator.maxTouchPoints;");
-        assertTrue(width.intValue() <= 430, "viewport width " + width + " CSS px is not a phone");
-        assertTrue(touchPoints.intValue() > 0, "no touch support");
+        ProductListPage page = shop.openProductList();
+        assertTrue(page.viewportWidth() <= 430, "viewport width " + page.viewportWidth() + " CSS px is not a phone");
+        assertTrue(page.maxTouchPoints() > 0, "no touch support");
     }
 
     @Test(description = "The viewport meta tag is present, otherwise phones render the page 980 px wide and shrink it")
     public void viewportIsSetForPhones() {
-        String content = (String) shop.script("return document.querySelector('meta[name=viewport]')?.content;");
-        assertEquals(content, "width=device-width, initial-scale=1");
+        assertEquals(shop.openProductList().viewportMeta(), "width=device-width, initial-scale=1");
     }
 
     @Test(description = "Products are in one column on a phone")
     public void productsAreInOneColumn() {
-        List<WebElement> cards = shop.productCards();
+        ProductListPage page = shop.openProductList();
+        List<WebElement> cards = page.productCards();
         assertEquals(cards.size(), 3);
-        double firstX = shop.box(cards.get(0)).get("x").doubleValue();
+        // One column: every card starts at the same x. In a grid the second card would sit to the right of the first.
+        double firstX = page.box(cards.get(0)).get("x").doubleValue();
         for (WebElement card : cards) {
-            Map<String, Number> box = shop.box(card);
-            assertEquals(box.get("x").doubleValue(), firstX, 0.5, "cards are not stacked in one column");
+            assertEquals(page.box(card).get("x").doubleValue(), firstX, 0.5, "cards are not stacked in one column");
         }
     }
 
     @Test(description = "No page scrolls sideways on a phone")
     public void noPageScrollsSideways() {
-        for (String page : List.of("index.html", "product.html?id=lamp", "cart.html", "checkout.html")) {
-            shop.open(page);
-            Number overflow = (Number) shop.script(
-                    "return document.documentElement.scrollWidth - document.documentElement.clientWidth;");
-            assertEquals(overflow.intValue(), 0, page + " scrolls sideways by " + overflow + " px");
+        List<Supplier<BasePage>> pages = List.of(
+                shop::openProductList, () -> shop.openProduct("lamp"), shop::openCart, shop::openCheckout);
+        for (Supplier<BasePage> open : pages) {
+            BasePage page = open.get();
+            int overflow = page.sidewaysOverflow();
+            assertEquals(overflow, 0, page.getClass().getSimpleName() + " scrolls sideways by " + overflow + " px");
         }
     }
 
     @Test(description = "The menu is behind a button on phones, opens on tap and leads to its pages")
     public void menuOpensFromTheMenuButton() {
-        By menu = By.id("menu-button");
-        By nav = By.id("main-nav");
-        assertFalse(shop.visible(menu).getAttribute("aria-expanded").equals("true"));
-        assertFalse(isDisplayed(nav), "the menu should be closed at first");
+        Header header = shop.openProductList().header();
+        // Closed at first, for the eye and for screen readers
+        assertFalse(header.isMenuShown(), "the menu should be closed at first");
+        assertFalse(header.menuButtonSaysOpen());
 
-        shop.tap(menu);
-        assertTrue(isDisplayed(nav), "the menu did not open");
-        assertEquals(shop.visible(menu).getAttribute("aria-expanded"), "true");
+        // Open it with a tap
+        header.tapMenuButton();
+        assertTrue(header.isMenuShown(), "the menu did not open");
+        assertTrue(header.menuButtonSaysOpen());
 
-        shop.tap(By.cssSelector("#main-nav a[href='checkout.html']"));
-        shop.awaitHeading("Checkout");
-    }
-
-    private boolean isDisplayed(By locator) {
-        return shop.waiting().until(d -> d.findElement(locator)).isDisplayed();
+        // A link in the open menu leads to its page (checkoutFromMenu waits for the Checkout heading)
+        header.checkoutFromMenu();
     }
 }

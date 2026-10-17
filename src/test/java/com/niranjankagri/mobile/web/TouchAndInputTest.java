@@ -1,11 +1,16 @@
 package com.niranjankagri.mobile.web;
 
+import static com.niranjankagri.mobile.web.pages.CheckoutPage.Field.EMAIL;
+import static com.niranjankagri.mobile.web.pages.CheckoutPage.Field.NAME;
+import static com.niranjankagri.mobile.web.pages.CheckoutPage.Field.PHONE;
+import static com.niranjankagri.mobile.web.pages.CheckoutPage.Field.POSTCODE;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
+import com.niranjankagri.mobile.web.pages.CheckoutPage;
+import com.niranjankagri.mobile.web.pages.ProductPage;
 import java.util.List;
 import java.util.Map;
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.testng.annotations.Test;
 
@@ -14,45 +19,50 @@ public class TouchAndInputTest extends WebTestBase {
 
     @Test(description = "Buttons are at least 44 x 44 CSS px, big enough for a finger")
     public void touchTargetsAreBigEnough() {
-        shop.open("product.html?id=mug");
-        for (String id : List.of("menu-button", "cart-link", "less", "more", "add-to-cart")) {
-            Map<String, Number> box = shop.box(shop.visible(By.id(id)));
+        ProductPage page = shop.openProduct("mug");
+        // Every control a finger uses on the product page: header, quantity stepper, main button
+        List<WebElement> controls = List.of(page.header().menuButton(), page.header().cartLink(),
+                page.lessButton(), page.moreButton(), page.addToCartButton());
+        for (WebElement control : controls) {
+            Map<String, Number> box = page.box(control);
             assertTrue(box.get("width").doubleValue() >= 44 && box.get("height").doubleValue() >= 44,
-                    id + " is only " + box.get("width") + " x " + box.get("height") + " px");
+                    control.getAttribute("id") + " is only " + box.get("width") + " x " + box.get("height") + " px");
         }
     }
 
     @Test(description = "Each checkout field asks for the right keyboard and offers autofill")
     public void checkoutFieldsChooseTheRightKeyboard() {
-        shop.open("checkout.html");
+        CheckoutPage page = shop.openCheckout();
         // type/inputmode decide the keyboard on a phone; autocomplete lets the browser fill saved details.
-        assertField("email", "email", null, "email");
-        assertField("phone", "tel", null, "tel");
-        assertField("postcode", "text", "numeric", "postal-code");
-        assertField("name", "text", null, "name");
+        assertField(page.fieldElement(EMAIL), "email", null, "email");
+        assertField(page.fieldElement(PHONE), "tel", null, "tel");
+        assertField(page.fieldElement(POSTCODE), "text", "numeric", "postal-code");
+        assertField(page.fieldElement(NAME), "text", null, "name");
     }
 
     @Test(description = "Inputs use at least 16 px text: iOS Safari zooms into smaller fields on focus and stays zoomed")
     public void inputsAreLargeEnoughToAvoidZoomOnFocus() {
-        shop.open("checkout.html");
-        for (WebElement input : shop.visible(By.id("checkout-form")).findElements(By.tagName("input"))) {
-            String size = (String) shop.script("return getComputedStyle(arguments[0]).fontSize;", input);
-            assertTrue(Double.parseDouble(size.replace("px", "")) >= 16, input.getAttribute("id") + " has font-size " + size);
+        CheckoutPage page = shop.openCheckout();
+        for (WebElement input : page.inputs()) {
+            double size = page.fontSize(input);
+            assertTrue(size >= 16, input.getAttribute("id") + " has font-size " + size + " px");
         }
     }
 
     @Test(description = "The add-to-cart button stays on screen at the bottom, within thumb reach")
     public void addToCartStaysWithinThumbReach() {
-        shop.open("product.html?id=lamp");
-        Map<String, Number> button = shop.box(shop.visible(By.id("add-to-cart")));
-        Number viewportHeight = (Number) shop.script("return window.innerHeight;");
+        ProductPage page = shop.openProduct("lamp");
+        Map<String, Number> button = page.box(page.addToCartButton());
+        double viewportHeight = page.viewportHeight();
+        // Fully on screen without scrolling, and in the lower half, where the thumb reaches when holding the phone
         double bottom = button.get("y").doubleValue() + button.get("height").doubleValue();
-        assertTrue(bottom <= viewportHeight.doubleValue(), "the button ends below the screen");
-        assertTrue(button.get("y").doubleValue() > viewportHeight.doubleValue() / 2, "the button is not in the lower half");
+        assertTrue(bottom <= viewportHeight, "the button ends below the screen");
+        assertTrue(button.get("y").doubleValue() > viewportHeight / 2, "the button is not in the lower half");
     }
 
-    private void assertField(String id, String type, String inputMode, String autocomplete) {
-        WebElement field = shop.visible(By.id(id));
+    /** Checks the three attributes that choose a field's keyboard and autofill; null means "not set". */
+    private void assertField(WebElement field, String type, String inputMode, String autocomplete) {
+        String id = field.getAttribute("id");
         assertEquals(field.getAttribute("type"), type, id + " type");
         assertEquals(field.getAttribute("inputmode"), inputMode, id + " inputmode");
         assertEquals(field.getAttribute("autocomplete"), autocomplete, id + " autocomplete");
