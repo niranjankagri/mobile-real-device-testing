@@ -1,0 +1,9 @@
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<!-- BrowserStack's sample iOS app on a real iPhone (App Automate). Needs BROWSERSTACK_USERNAME and BROWSERSTACK_ACCESS_KEY. -->
+<suite name="Native iOS app" verbose="1">
+    <test name="App">
+        <classes>
+            <class name="com.niranjankagri.mobile.app.SampleAppTest"/>
+        </classes>
+    </test>
+</suite>
