@@ -17,6 +17,7 @@ public final class UiElementsScreen extends Screen {
     // No accessibility id for the title: the iOS element type, found fast by a class chain.
     private static final By NAV_TITLE = AppiumBy.iOSClassChain("**/XCUIElementTypeNavigationBar");
 
+    /** Created by the tab bar or atStart(), never by tests. */
     UiElementsScreen(IOSDriver driver) {
         super(driver);
     }
@@ -26,6 +27,7 @@ public final class UiElementsScreen extends Screen {
         return new UiElementsScreen(driver).await();
     }
 
+    /** Waits until the screen is shown (its Text button is visible). */
     UiElementsScreen await() {
         visible(TEXT_BUTTON);
         return this;

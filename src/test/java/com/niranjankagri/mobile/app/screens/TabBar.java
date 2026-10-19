@@ -11,15 +11,18 @@ public final class TabBar {
 
     private final Screen screen;
 
+    /** The tab bar of the screen it belongs to (screens create it). */
     TabBar(Screen screen) {
         this.screen = screen;
     }
 
+    /** Taps the UI Elements tab and returns that screen once it is shown. */
     public UiElementsScreen openUiElements() {
         screen.visible(UI_ELEMENTS).click();
         return new UiElementsScreen(screen.driver).await();
     }
 
+    /** Taps the Web View tab and returns that screen once it is shown. */
     public WebViewScreen openWebView() {
         screen.visible(WEB_VIEW).click();
         return new WebViewScreen(screen.driver).await();

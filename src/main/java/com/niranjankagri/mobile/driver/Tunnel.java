@@ -30,6 +30,7 @@ public final class Tunnel implements AutoCloseable {
         return tunnel;
     }
 
+    /** Stops the tunnel; a failure to stop is ignored, the process ends with the JVM. */
     @Override
     public void close() {
         try {

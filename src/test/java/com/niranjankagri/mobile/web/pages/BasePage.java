@@ -19,6 +19,7 @@ public abstract class BasePage {
     protected final WebDriverWait wait;
     private final Header header;
 
+    /** Page objects are created by PocketShop or by the page an action leads from. */
     protected BasePage(WebDriver driver) {
         this.driver = driver;
         // Generous: a real device over the tunnel is slower than local Chrome. Waits end as soon as the condition holds.

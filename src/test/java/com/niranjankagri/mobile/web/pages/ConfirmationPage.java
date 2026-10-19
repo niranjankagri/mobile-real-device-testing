@@ -8,10 +8,12 @@ public final class ConfirmationPage extends BasePage {
 
     private static final By ORDER_NUMBER = By.id("order-number");
 
+    /** Created by placeOrder(), never by tests. */
     ConfirmationPage(WebDriver driver) {
         super(driver);
     }
 
+    /** Waits until the confirmation heading is shown. */
     ConfirmationPage await() {
         awaitHeading("Order confirmed");
         return this;

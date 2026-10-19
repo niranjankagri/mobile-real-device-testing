@@ -29,6 +29,7 @@ public abstract class AppTestBase {
     /** The screen the app shows after the restart; each test starts here. */
     protected UiElementsScreen app;
 
+    /** One iPhone session for the whole suite: a new session costs about 20 seconds of device time. */
     @BeforeSuite(alwaysRun = true)
     public void startApp() {
         driver = AppDrivers.iphone("Sample app suite: native iOS on a real iPhone");
@@ -42,6 +43,10 @@ public abstract class AppTestBase {
         app = UiElementsScreen.atStart(driver);
     }
 
+    /**
+     * After a failed test: a screenshot and the element tree in reports/app/, and the failure counted for the
+     * dashboard.
+     */
     @AfterMethod(alwaysRun = true)
     public void keepEvidence(ITestResult result) throws IOException {
         if (result.getStatus() == ITestResult.FAILURE) {

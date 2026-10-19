@@ -21,6 +21,7 @@ public enum Target {
      */
     private final String host;
 
+    /** description goes into the session name; host is how the browser reaches PocketShop on this machine. */
     Target(String description, String host) {
         this.description = description;
         this.host = host;

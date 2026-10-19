@@ -18,6 +18,7 @@ public final class WebDrivers {
     private static final String IPHONE_USER_AGENT = "Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 "
             + "(KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1";
 
+    /** Factory methods only: no instances. */
     private WebDrivers() {}
 
     /** Local Chrome emulating a phone, or the browser on a real phone at BrowserStack. */

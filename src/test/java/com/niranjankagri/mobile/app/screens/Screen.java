@@ -16,6 +16,7 @@ public abstract class Screen {
     protected final IOSDriver driver;
     protected final WebDriverWait wait;
 
+    /** Every screen shares the driver and one explicit wait. */
     protected Screen(IOSDriver driver) {
         this.driver = driver;
         this.wait = new WebDriverWait(driver, Duration.ofSeconds(15));

@@ -35,6 +35,10 @@ public abstract class WebTestBase {
     private static Tunnel tunnel;
     private static int failures;
 
+    /**
+     * Once per suite: the target from -Dtarget, PocketShop on this machine, the tunnel for real devices, and one
+     * browser.
+     */
     @BeforeSuite(alwaysRun = true)
     public void startSuite() {
         // Order matters: the site must be running and the tunnel open before a device tries to load a page.
@@ -47,6 +51,7 @@ public abstract class WebTestBase {
         shop = new PocketShop(driver, target.baseUrl(PORT));
     }
 
+    /** Every test starts on the product list with an empty cart. */
     @BeforeMethod(alwaysRun = true)
     public void freshShop() {
         shop.startEmpty();
@@ -63,6 +68,10 @@ public abstract class WebTestBase {
         }
     }
 
+    /**
+     * Reports the result to BrowserStack, ends the session (which stops the minutes), then closes the tunnel and the
+     * site.
+     */
     @AfterSuite(alwaysRun = true)
     public void endSuite() {
         // Close in reverse order. On BrowserStack the session must end (quit) to stop using minutes.

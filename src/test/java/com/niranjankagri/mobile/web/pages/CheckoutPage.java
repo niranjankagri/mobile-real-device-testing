@@ -23,10 +23,12 @@ public final class CheckoutPage extends BasePage {
         }
     }
 
+    /** Created by PocketShop, the cart or the menu, never by tests. */
     CheckoutPage(WebDriver driver) {
         super(driver);
     }
 
+    /** Waits until the checkout heading is shown. */
     CheckoutPage await() {
         awaitHeading("Checkout");
         return this;

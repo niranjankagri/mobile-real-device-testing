@@ -17,6 +17,7 @@ public final class AppDrivers {
     /** The uploaded app: a custom id or a bs:// app URL; -DbsApp=... tests another upload. */
     public static final String APP = System.getProperty("bsApp", "bstack-sample-ios");
 
+    /** Factory methods only: no instances. */
     private AppDrivers() {}
 
     /** Starts the app on a real iPhone 16 with iOS 18. Device and OS must be a pair BrowserStack offers. */

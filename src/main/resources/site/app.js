@@ -8,6 +8,7 @@ const PRODUCTS = [
 
 // Prices in euros with two decimals, for example "€ 12.50"
 const money = (value) => `€ ${value.toFixed(2)}`;
+/** The product with this id, or undefined. */
 const byId = (id) => PRODUCTS.find((p) => p.id === id);
 
 /** The cart: { productId: quantity }. localStorage survives page loads, like a real shop's client-side cart. */
@@ -71,6 +72,7 @@ function setUpProduct() {
 
   const quantity = document.getElementById('quantity');
   let amount = 1;
+  /** Shows the current amount between the - and + buttons. */
   const show = () => (quantity.textContent = String(amount));
   document.getElementById('less').addEventListener('click', () => {
     amount = Math.max(1, amount - 1);

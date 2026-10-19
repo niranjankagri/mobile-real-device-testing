@@ -12,11 +12,13 @@ public final class PocketShop {
     private final WebDriver driver;
     private final String baseUrl;
 
+    /** baseUrl is the shop's address as the browser sees it (localhost, or bs-local.com on BrowserStack). */
     public PocketShop(WebDriver driver, String baseUrl) {
         this.driver = driver;
         this.baseUrl = baseUrl;
     }
 
+    /** Opens the product list. */
     public ProductListPage openProductList() {
         load(ProductListPage.PATH);
         return new ProductListPage(driver).await();
@@ -28,11 +30,13 @@ public final class PocketShop {
         return new ProductPage(driver).await();
     }
 
+    /** Opens the cart directly by its address. */
     public CartPage openCart() {
         load(CartPage.PATH);
         return new CartPage(driver).await();
     }
 
+    /** Opens the checkout directly by its address. */
     public CheckoutPage openCheckout() {
         load(CheckoutPage.PATH);
         return new CheckoutPage(driver).await();

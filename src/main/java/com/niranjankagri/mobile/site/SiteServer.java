@@ -22,6 +22,7 @@ public final class SiteServer implements AutoCloseable {
 
     private final HttpServer server;
 
+    /** Use start(port). */
     private SiteServer(HttpServer server) {
         this.server = server;
     }
@@ -68,6 +69,7 @@ public final class SiteServer implements AutoCloseable {
         return server.getAddress().getPort();
     }
 
+    /** Stops the site at once. */
     @Override
     public void close() {
         server.stop(0);

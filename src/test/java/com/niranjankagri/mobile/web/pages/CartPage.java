@@ -11,10 +11,12 @@ public final class CartPage extends BasePage {
     private static final By TOTAL = By.id("cart-total");
     private static final By CHECKOUT = By.id("checkout-link");
 
+    /** Created by PocketShop or the header, never by tests. */
     CartPage(WebDriver driver) {
         super(driver);
     }
 
+    /** Waits until the cart's heading is shown. */
     CartPage await() {
         awaitHeading("Your cart");
         return this;

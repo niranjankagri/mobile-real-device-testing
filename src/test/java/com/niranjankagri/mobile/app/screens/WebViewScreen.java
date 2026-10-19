@@ -10,10 +10,12 @@ public final class WebViewScreen extends Screen {
     private static final By WEB_VIEW = AppiumBy.className("XCUIElementTypeWebView");
     private static final By LINKS_IN_PAGE = AppiumBy.iOSClassChain("**/XCUIElementTypeWebView/**/XCUIElementTypeLink");
 
+    /** Created by the tab bar, never by tests. */
     WebViewScreen(IOSDriver driver) {
         super(driver);
     }
 
+    /** Waits until the web view element is on screen; awaitPageLoaded() waits for its content. */
     WebViewScreen await() {
         visible(WEB_VIEW);
         return this;

@@ -14,6 +14,7 @@ public final class Header {
 
     private final BasePage page;
 
+    /** The header of one page; it acts through that page's waits and taps. */
     Header(BasePage page) {
         this.page = page;
     }

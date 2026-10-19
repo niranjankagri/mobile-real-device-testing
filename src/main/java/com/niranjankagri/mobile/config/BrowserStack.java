@@ -21,6 +21,7 @@ public final class BrowserStack {
     /** Groups the sessions of one run in the BrowserStack dashboard. */
     public static final String BUILD = System.getProperty("bsBuild", "local-" + System.currentTimeMillis());
 
+    /** Constants and helpers only: no instances. */
     private BrowserStack() {}
 
     /** The account name, from BROWSERSTACK_USERNAME. */
@@ -56,6 +57,7 @@ public final class BrowserStack {
         return value;
     }
 
+    /** A constant URL; a typo fails at class load instead of at the first session. */
     private static URL url(String value) {
         try {
             return URI.create(value).toURL();

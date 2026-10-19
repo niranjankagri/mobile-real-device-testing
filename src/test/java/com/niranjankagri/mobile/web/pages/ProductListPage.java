@@ -13,10 +13,12 @@ public final class ProductListPage extends BasePage {
 
     private static final By CARDS = By.cssSelector("[data-product]");
 
+    /** Created by PocketShop, never by tests. */
     ProductListPage(WebDriver driver) {
         super(driver);
     }
 
+    /** Waits until the Products heading is shown. */
     ProductListPage await() {
         awaitHeading("Products");
         return this;

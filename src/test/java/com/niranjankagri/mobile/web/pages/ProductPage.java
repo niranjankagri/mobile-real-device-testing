@@ -15,10 +15,12 @@ public final class ProductPage extends BasePage {
     private static final By ADD_TO_CART = By.id("add-to-cart");
     private static final By ADDED = By.id("added");
 
+    /** Created by PocketShop or the product list, never by tests. */
     ProductPage(WebDriver driver) {
         super(driver);
     }
 
+    /** Waits until app.js has filled in the product's name. */
     ProductPage await() {
         // app.js fills in the name; the placeholder heading is "Product"
         wait.until(ExpectedConditions.not(ExpectedConditions.textToBe(NAME, "Product")));
