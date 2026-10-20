@@ -35,6 +35,16 @@ jobs:
           cache: maven
       # Chrome is preinstalled on the runner; Selenium Manager fetches the matching driver.
       - run: ./mvnw -B test -Dtarget=local -Dheadless=true
+      # JUnit XML only, as its own artifact: the CI results collection of
+      # automation-coverage-quality-intelligence imports it (config/producers.toml there)
+      - name: Keep the JUnit results
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: junit-emulation
+          path: target/surefire-reports/TEST-*.xml
+          if-no-files-found: warn
+          retention-days: 30
       - uses: actions/upload-artifact@v7
         if: failure()
         with:
