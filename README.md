@@ -129,12 +129,16 @@ src/test/java/com/niranjankagri/mobile/
 
 ## CI
 
-[`.github/workflows/ci.yml`](.github/workflows/ci.yml): on every push, the web suite in headless Chrome mobile
-emulation. Real devices only through "Run workflow" with a choice (iPhone web, Android web, iPhone app, or all); they
+[`.github/workflows/ci.yml`](.github/workflows/ci.yml): on every push and pull request, the web suite in headless Chrome mobile
+emulation; its JUnit XML is kept as the `junit-emulation` artifact, which
+[Automation Coverage & Quality Intelligence](https://github.com/niranjankagri/automation-coverage-quality-intelligence) collects. Real devices only through "Run workflow" with a choice (iPhone web, Android web, iPhone app, or all); they
 need the repository secrets `BROWSERSTACK_USERNAME` and `BROWSERSTACK_ACCESS_KEY`.
+
+`main` is protected by a ruleset: every change goes through a pull request, and the web suite must pass before it is
+merged.
 
 See [docs/framework-design.md](docs/framework-design.md) and [docs/interview-questions.md](docs/interview-questions.md).
 
 ## License
 
-MIT
+[MIT](LICENSE)
