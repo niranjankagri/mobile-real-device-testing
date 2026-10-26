@@ -134,6 +134,8 @@ emulation; its JUnit XML is kept as the `junit-emulation` artifact, which
 [Automation Coverage & Quality Intelligence](https://github.com/niranjankagri/automation-coverage-quality-intelligence) collects. Real devices only through "Run workflow" with a choice (iPhone web, Android web, iPhone app, or all); they
 need the repository secrets `BROWSERSTACK_USERNAME` and `BROWSERSTACK_ACCESS_KEY`.
 
+CI also runs every Saturday at 23:15 UTC without a code change, so a broken dependency or a change outside the repository shows up within a week. Dependabot proposes dependency and GitHub Actions updates once a month (minor and patch updates grouped, major versions as separate pull requests).
+
 `main` is protected by a ruleset: every change goes through a pull request, and the web suite must pass before it is
 merged.
 
