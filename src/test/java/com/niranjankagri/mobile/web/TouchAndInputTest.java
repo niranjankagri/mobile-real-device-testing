@@ -17,8 +17,8 @@ import org.testng.annotations.Test;
 /** Fingers and on-screen keyboards: target sizes, keyboard types, and the iOS zoom-on-focus trap. */
 public class TouchAndInputTest extends WebTestBase {
 
-    @Test(description = "Buttons are at least 44 x 44 CSS px, big enough for a finger")
-    public void touchTargetsAreBigEnough() {
+    @Test(description = "[TC-110] Buttons are at least 44 x 44 CSS px, big enough for a finger")
+    public void tc110_touchTargetsAreBigEnough() {
         ProductPage page = shop.openProduct("mug");
         // Every control a finger uses on the product page: header, quantity stepper, main button
         List<WebElement> controls = List.of(page.header().menuButton(), page.header().cartLink(),
@@ -30,8 +30,8 @@ public class TouchAndInputTest extends WebTestBase {
         }
     }
 
-    @Test(description = "Each checkout field asks for the right keyboard and offers autofill")
-    public void checkoutFieldsChooseTheRightKeyboard() {
+    @Test(description = "[TC-111] Each checkout field asks for the right keyboard and offers autofill")
+    public void tc111_checkoutFieldsChooseTheRightKeyboard() {
         CheckoutPage page = shop.openCheckout();
         // type/inputmode decide the keyboard on a phone; autocomplete lets the browser fill saved details.
         assertField(page.fieldElement(EMAIL), "email", null, "email");
@@ -40,8 +40,8 @@ public class TouchAndInputTest extends WebTestBase {
         assertField(page.fieldElement(NAME), "text", null, "name");
     }
 
-    @Test(description = "Inputs use at least 16 px text: iOS Safari zooms into smaller fields on focus and stays zoomed")
-    public void inputsAreLargeEnoughToAvoidZoomOnFocus() {
+    @Test(description = "[TC-112] Inputs use at least 16 px text: iOS Safari zooms into smaller fields on focus and stays zoomed")
+    public void tc112_inputsAreLargeEnoughToAvoidZoomOnFocus() {
         CheckoutPage page = shop.openCheckout();
         for (WebElement input : page.inputs()) {
             double size = page.fontSize(input);
@@ -49,8 +49,8 @@ public class TouchAndInputTest extends WebTestBase {
         }
     }
 
-    @Test(description = "The add-to-cart button stays on screen at the bottom, within thumb reach")
-    public void addToCartStaysWithinThumbReach() {
+    @Test(description = "[TC-113] The add-to-cart button stays on screen at the bottom, within thumb reach")
+    public void tc113_addToCartStaysWithinThumbReach() {
         ProductPage page = shop.openProduct("lamp");
         Map<String, Number> button = page.box(page.addToCartButton());
         double viewportHeight = page.viewportHeight();
