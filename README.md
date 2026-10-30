@@ -30,6 +30,8 @@ devices reach it through the tunnel, the same way teams test a staging server th
 | Shopping flow (`ShoppingFlowTest`) | 4 | quantity and cart badge; the cart survives a reload; validation errors move focus to the first invalid field; a complete purchase |
 | Native app (`SampleAppTest`) | 5 | starts on the right tab; text typed on the real keyboard is shown back; a native alert opens and closes; the web view tab loads web content; tab switching |
 
+Every test starts with its case ID (`tc109_completePurchase`, description `[TC-109] ...`); the 18 cases (web TC-101 to TC-113, native app TC-114 to TC-118) are written out for a manual run on a phone in [docs/manual-test-cases.md](docs/manual-test-cases.md).
+
 ## What the real devices found
 
 The Android phone failed the checkout test that passed in local Chrome and on the iPhone. A screenshot showed a valid
